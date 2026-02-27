@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Sfondo marrone caldo con angoli arrotondati -->
+  <rect width="512" height="512" rx="113" fill="#795548"/>
+  <!-- Alone ambrato -->
+  <circle cx="256" cy="256" r="195" fill="#FFC107" opacity="0.18"/>
+  <!-- Biscotto stilizzato -->
+  <circle cx="256" cy="256" r="155" fill="#FFC107"/>
+  <circle cx="256" cy="256" r="155" fill="#BF360C" opacity="0.22"/>
+  <!-- Decorazioni (gocce cioccolato) -->
+  <circle cx="200" cy="200" r="19" fill="#4E342E" opacity="0.75"/>
+  <circle cx="258" cy="183" r="15" fill="#4E342E" opacity="0.65"/>
+  <circle cx="315" cy="208" r="17" fill="#4E342E" opacity="0.75"/>
+  <circle cx="183" cy="263" r="16" fill="#4E342E" opacity="0.65"/>
+  <circle cx="247" cy="258" r="21" fill="#4E342E" opacity="0.75"/>
+  <circle cx="313" cy="272" r="18" fill="#4E342E" opacity="0.65"/>
+  <circle cx="198" cy="322" r="17" fill="#4E342E" opacity="0.75"/>
+  <circle cx="272" cy="328" r="15" fill="#4E342E" opacity="0.65"/>
+  <circle cx="328" cy="318" r="16" fill="#4E342E" opacity="0.75"/>
+  <!-- Contorno biscotto -->
+  <circle cx="256" cy="256" r="155" fill="none" stroke="#BF360C" stroke-width="5" opacity="0.35"/>
+  <!-- Brillantezza -->
+  <ellipse cx="210" cy="195" rx="45" ry="28" fill="white" opacity="0.12" transform="rotate(-30 210 195)"/>
+</svg>

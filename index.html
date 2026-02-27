@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA / Theme -->
+    <meta name="theme-color" content="#795548" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Il Mio Ricettario" />
+    <meta name="application-name" content="Il Mio Ricettario" />
+
+    <!-- SEO / Description -->
+    <meta name="description" content="Ricettario digitale per biscottificio artigianale. Gestisci ricette, scala dosi e calcola i costi. Tutto offline." />
+    <meta name="keywords" content="ricettario, biscotti, biscottificio, ricette, dolci, pasticceria" />
+    <meta name="author" content="Il Mio Ricettario" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Il Mio Ricettario 🍪" />
+    <meta property="og:description" content="Ricettario digitale per biscottificio artigianale" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icons/icon-512.png" />
+
+    <title>Il Mio Ricettario 🍪</title>
+
+    <!-- Favicon SVG (moderni browser) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Favicon PNG fallback -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-source.svg" />
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+
+    <!-- PWA Manifest — file fisico generato da vite-plugin-pwa -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileColor" content="#795548" />
+    <meta name="msapplication-TileImage" content="/icons/icon-144.png" />
+
+    <!-- Preconnect Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ── Splash screen HTML pura — visibile PRIMA di React ── */
+      #splash {
+        position: fixed;
+        inset: 0;
+        background: #FFF8E1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        font-family: 'Nunito', 'Segoe UI', sans-serif;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      #splash.hiding {
+        opacity: 0;
+        transform: scale(1.05);
+        pointer-events: none;
+      }
+      #splash .cookie-anim {
+        font-size: 88px;
+        line-height: 1;
+        animation: cookieBounce 1s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        filter: drop-shadow(0 8px 32px rgba(121,85,72,0.30));
+      }
+      #splash .app-name {
+        margin-top: 28px;
+        font-size: 30px;
+        font-weight: 800;
+        color: #795548;
+        letter-spacing: -0.5px;
+        animation: fadeUp 0.6s 0.3s ease both;
+      }
+      #splash .app-sub {
+        margin-top: 8px;
+        font-size: 15px;
+        color: #a1887f;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        animation: fadeUp 0.6s 0.5s ease both;
+      }
+      #splash .loader {
+        margin-top: 56px;
+        width: 56px;
+        height: 4px;
+        background: #D7CCC8;
+        border-radius: 99px;
+        overflow: hidden;
+        animation: fadeUp 0.6s 0.7s ease both;
+      }
+      #splash .loader-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #795548, #FFC107);
+        border-radius: 99px;
+        animation: loadProgress 1.6s 0.8s cubic-bezier(0.4,0,0.2,1) forwards;
+        width: 0%;
+      }
+
+      @keyframes cookieBounce {
+        0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+        60%  { transform: scale(1.2) rotate(8deg);  opacity: 1; }
+        80%  { transform: scale(0.9) rotate(-4deg); }
+        100% { transform: scale(1) rotate(0deg);    opacity: 1; }
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0);    }
+      }
+      @keyframes loadProgress {
+        0%   { width: 0%;   }
+        30%  { width: 35%;  }
+        70%  { width: 75%;  }
+        100% { width: 100%; }
+      }
+
+      /* Reset base globale */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { height: 100%; }
+      body {
+        font-family: 'Nunito', 'Segoe UI', sans-serif;
+        background: #FFF8E1;
+        -webkit-font-smoothing: antialiased;
+        -webkit-tap-highlight-color: transparent;
+        overflow: hidden;
+      }
+      #root { height: 100%; }
+    </style>
+  </head>
+  <body>
+    <!-- Splash nativa: visibile immediatamente, prima che React carichi -->
+    <div id="splash" role="status" aria-label="Caricamento Il Mio Ricettario">
+      <div class="cookie-anim" aria-hidden="true">🍪</div>
+      <div class="app-name">Il Mio Ricettario</div>
+      <div class="app-sub">Biscottificio Artigianale</div>
+      <div class="loader" aria-hidden="true">
+        <div class="loader-bar"></div>
+      </div>
+    </div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <script>
+      // Rimuove lo splash dopo che React ha montato l'app.
+      // MutationObserver: aspetta che #root abbia figli + delay minimo 1.8s.
+      (function() {
+        var splash = document.getElementById('splash');
+        var root   = document.getElementById('root');
+        var minDelayDone = false;
+        var reactMounted = false;
+
+        function tryHide() {
+          if (minDelayDone && reactMounted && splash) {
+            splash.classList.add('hiding');
+            setTimeout(function() {
+              if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
+            }, 550);
+          }
+        }
+
+        setTimeout(function() { minDelayDone = true; tryHide(); }, 1800);
+
+        if (root) {
+          var observer = new MutationObserver(function() {
+            if (root.children.length > 0) {
+              observer.disconnect();
+              reactMounted = true;
+              tryHide();
+            }
+          });
+          observer.observe(root, { childList: true, subtree: true });
+        }
+      })();
+    </script>
+  </body>
+</html>
