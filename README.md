@@ -1,157 +1,110 @@
 # 🍪 Il Mio Ricettario
 
-App web progressiva (PWA) per la gestione ricette di un biscottificio artigianale.
-Funziona completamente **offline**, nessun server, nessun cloud.
+App PWA per la gestione ricette di un biscottificio artigianale.
+Funziona completamente **offline** dopo la prima installazione.
 
 ---
 
-## 📱 Come installare su Android (3 metodi)
-
-### Metodo 1 — PWABuilder → APK (Consigliato)
-
-PWABuilder è uno strumento gratuito di Microsoft che converte una PWA in APK Android.
-
-#### Prerequisiti
-- Un account GitHub gratuito
-- La web app pubblicata online (GitHub Pages è gratuito)
-
-#### Step 1 — Pubblica su GitHub Pages
+## ⚡ Build rapida (segui nell'ordine)
 
 ```bash
-# Installa il tool di deploy
-npm install -D gh-pages
+# 1. Installa dipendenze
+npm install
 
-# Aggiungi al package.json → scripts:
-# "deploy": "gh-pages -d dist"
+# 2. Genera le icone PNG (OBBLIGATORIO per PWABuilder)
+node scripts/prebuild.mjs
 
-# Build + deploy
+# 3. Build produzione
 npm run build
-npm run deploy
+
+# 4. Testa in locale
+npx serve -s dist -l 3000
 ```
 
-L'app sarà disponibile su:
-`https://[tuo-username].github.io/[nome-repo]/`
+---
 
-#### Step 2 — Genera le icone PNG (necessarie per PWABuilder)
+## 🚀 Deploy su Vercel
 
 ```bash
-# Installa sharp per generare PNG da SVG
-npm install -D sharp
-
-# Genera tutte le icone
-node scripts/generate-icons-png.mjs
-
-# Rebuild con le icone PNG
+npm install
+node scripts/prebuild.mjs
 npm run build
-npm run deploy
+# poi push su GitHub → Vercel fa il deploy automatico
 ```
 
-#### Step 3 — Usa PWABuilder
+> ⚠️ **Importante per Vercel**: Vercel esegue solo `npm run build`.
+> Le icone devono essere generate **prima** del push, oppure
+> aggiungi un Build Command personalizzato su Vercel:
+> `node scripts/prebuild.mjs && npm run build`
 
-1. Vai su **https://www.pwabuilder.com**
-2. Incolla l'URL della tua app (es. `https://tuousername.github.io/ricettario/`)
-3. Clicca **"Start"** — PWABuilder analizza il manifest e il SW
-4. Il punteggio deve essere **verde** su tutte le voci
-5. Clicca **"Package for stores"**
-6. Seleziona **"Android"** → **"Generate Package"**
-7. Scegli **"Android App Bundle (.aab)"** per il Play Store
-   oppure **"APK"** per installazione diretta
-8. Scarica il file `.apk` o `.aab`
+### Configurazione Build Command su Vercel:
+1. Vai su Vercel → il tuo progetto → **Settings → General**
+2. **Build Command**: `node scripts/prebuild.mjs && npm run build`
+3. **Output Directory**: `dist`
+4. Salva e rideploya
 
-#### Step 4 — Installa l'APK sul dispositivo
+---
 
+## 📱 PWABuilder → APK Android
+
+### Prerequisiti
+Le icone PNG devono esistere in `public/icons/`. Verificale con:
+```bash
+ls public/icons/
+# deve mostrare: icon-72.png, icon-96.png, ... icon-512.png
+```
+
+### Passi
+1. Fai il deploy su Vercel (con icone incluse)
+2. Vai su **[pwabuilder.com](https://www.pwabuilder.com)**
+3. Incolla l'URL Vercel → **"Start"**
+4. Tutti i punteggi devono essere verdi 🟢
+5. **"Package for stores"** → **"Android"** → **"Generate Package"**
+6. Scarica lo ZIP → dentro c'è `app-release.apk`
+
+### Installa APK sul dispositivo
 ```bash
 # Con cavo USB (ADB)
 adb install app-release.apk
 
-# Oppure: copia sul telefono e apri dal file manager
-# Impostazioni → App → Installa app sconosciute → Attiva
+# Oppure: copia l'APK sul telefono e aprilo dal file manager
+# Impostazioni → Sicurezza → Installa app sconosciute → Attiva
 ```
 
 ---
 
-### Metodo 2 — PWA diretta da Chrome (più semplice, nessun APK)
+## 🛠 Stack tecnico
 
-```bash
-# Avvia server locale
-npm run build
-npx serve -s dist -l 3000
-
-# Sul telefono Android (stesso WiFi):
-# Chrome → http://[IP-PC]:3000
-# Tre puntini → "Aggiungi a schermata Home"
-```
-
-✅ Funziona offline, fullscreen, sembra un'app nativa.
-
----
-
-### Metodo 3 — Netlify Drop (deploy in 30 secondi)
-
-1. `npm run build`
-2. Vai su **https://app.netlify.com/drop**
-3. Trascina la cartella `dist/` nella pagina
-4. Copia l'URL generato (es. `https://random-name.netlify.app`)
-5. Usa quell'URL su PWABuilder
+| Tecnologia | Uso |
+|---|---|
+| React 19 | UI framework |
+| TypeScript | Type safety |
+| Vite 7 | Build tool |
+| Tailwind CSS 4 | Styling |
+| Zustand | State management |
+| React Router v7 | Navigazione |
+| vite-plugin-pwa | Service Worker + Manifest |
+| Workbox | Cache offline |
+| sharp | Generazione icone PNG |
+| localStorage | Persistenza dati locale |
 
 ---
 
-## 🛠 Sviluppo locale
-
-```bash
-# Installa dipendenze
-npm install
-
-# Avvia dev server
-npm run dev
-
-# Build produzione
-npm run build
-
-# Preview build locale
-npm run preview
-
-# Genera icone SVG
-node scripts/generate-icons.mjs
-
-# Genera icone PNG (richiede: npm install -D sharp)
-node scripts/generate-icons-png.mjs
-```
-
----
-
-## 📋 Stack tecnico
-
-| Componente | Tecnologia | Equivalente Flutter |
-|---|---|---|
-| Framework UI | React 19 + TypeScript | Flutter + Dart |
-| Build tool | Vite 7 | flutter build |
-| Stile | Tailwind CSS 4 | Material 3 |
-| State management | Zustand | Riverpod |
-| Database | localStorage (JSON) | Hive |
-| Routing | React Router 7 | GoRouter |
-| PWA / Offline | vite-plugin-pwa + Workbox | — |
-| Icone | Lucide React | Material Icons |
-| Font | Nunito (Google Fonts) | Google Fonts |
-
----
-
-## 📁 Struttura cartelle
+## 📂 Struttura cartelle
 
 ```
 src/
-├── main.tsx              # Entry point + SW registration
-├── App.tsx               # Shell responsive + tema + routing
-├── index.css             # Stili globali
+├── App.tsx                    # Entry point, shell responsive
+├── main.tsx                   # Mount React + registra SW
 ├── config/
-│   ├── constants.ts      # Costanti app (categorie, tags, ecc.)
-│   └── theme.ts          # Palette colori
+│   ├── constants.ts           # Costanti app, categorie, tag
+│   └── theme.ts               # Colori e design tokens
 ├── models/
-│   └── types.ts          # TypeScript types (Ricetta, Ingrediente, ecc.)
+│   └── types.ts               # Tipi TypeScript (Ricetta, Ingrediente, ...)
 ├── providers/
-│   └── store.ts          # Zustand store (ricette, categorie, prezzi, impostazioni)
+│   └── store.ts               # Zustand store (ricette, categorie, prezzi, preferenze)
 ├── services/
-│   └── database_service.ts  # CRUD localStorage + dati di esempio
+│   └── database_service.ts    # CRUD localStorage
 ├── screens/
 │   ├── HomeScreen.tsx
 │   ├── ListaRicetteScreen.tsx
@@ -161,78 +114,75 @@ src/
 │   ├── ImpostazioniScreen.tsx
 │   ├── GestioneCategorieScreen.tsx
 │   └── OnboardingScreen.tsx
-├── widgets/
-│   ├── RicettaCard.tsx
-│   ├── FiltriBottomSheet.tsx
-│   ├── TimerBottomSheet.tsx
-│   ├── CondividiModal.tsx
-│   └── ShimmerLoader.tsx
+└── widgets/
+    ├── RicettaCard.tsx
+    ├── FiltriBottomSheet.tsx
+    ├── TimerBottomSheet.tsx
+    ├── CondividiModal.tsx
+    └── ShimmerLoader.tsx
+
 public/
 ├── favicon.svg
-├── apple-touch-icon.png
-├── icons/                # Icone PWA (72, 96, 128, 144, 152, 192, 384, 512)
-└── screenshots/          # Screenshot per PWABuilder
+├── favicon.png                # generato da prebuild.mjs
+├── apple-touch-icon.png       # generato da prebuild.mjs
+└── icons/
+    ├── icon-72.png            # generato da prebuild.mjs
+    ├── icon-96.png
+    ├── icon-128.png
+    ├── icon-144.png
+    ├── icon-152.png
+    ├── icon-192.png           # usata come icona principale
+    ├── icon-384.png
+    └── icon-512.png           # usata come maskable icon
+
 scripts/
-├── generate-icons.mjs    # Genera SVG placeholder
-└── generate-icons-png.mjs  # Genera PNG reali (richiede sharp)
+├── prebuild.mjs               # Genera icone PNG con sharp
+└── generate-icons-png.mjs     # Alias dello stesso script
 ```
 
 ---
 
-## ✅ Checklist PWABuilder
+## ✨ Funzionalità
 
-Prima di usare PWABuilder, verifica:
-
-- [ ] App pubblicata su HTTPS
-- [ ] `/manifest.webmanifest` raggiungibile e valido
-- [ ] Service Worker registrato e funzionante
-- [ ] Icone PNG presenti in tutte le dimensioni richieste (almeno 512×512)
-- [ ] `start_url` nel manifest corrisponde all'URL dell'app
-- [ ] App funziona offline (ricarica senza internet)
-
-Verifica con: **Chrome DevTools → Application → Manifest / Service Workers**
+- 📖 **Gestione ricette** completa (crea, modifica, elimina, duplica)
+- 📊 **Scala dosi** con ricalcolo automatico ingredienti
+- 💰 **Calcolatore costi** con slider margine e prezzo vendita
+- ⏱ **Timer integrato** con notifica audio e vibrazione
+- 🔍 **Ricerca e filtri** su nome, ingredienti, tags, categoria, difficoltà
+- 📤 **Condividi** ricetta formato WhatsApp
+- 🖥 **WakeLock** - schermo sempre acceso in laboratorio
+- 🔍 **Modalità Laboratorio** - testo ingrandito al 130%
+- 💾 **Backup/Ripristino** JSON completo
+- 📥 **Esporta CSV** costi
+- 🎨 **Tema chiaro/scuro/automatico**
+- 📱 **PWA installabile** su Android e iOS
+- 🔌 **100% offline** dopo la prima visita
 
 ---
 
-## 🔧 Configurazione PWABuilder avanzata
+## 🆘 Risoluzione problemi
 
-Dopo aver generato il package Android con PWABuilder, puoi personalizzare:
-
-**Nel file `assetlinks.json`** (per Android App Links):
-```json
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.biscottificio.ricettario",
-    "sha256_cert_fingerprints": ["..."]
-  }
-}]
+### PWABuilder: "icons not fetchable" (404)
+```bash
+# Le icone non sono state generate. Esegui:
+node scripts/prebuild.mjs
+npm run build
+# poi ripusha su GitHub
 ```
 
-**Pubblica su:** `https://tuodominio.com/.well-known/assetlinks.json`
+### Vercel non trova le icone
+Imposta il Build Command su Vercel a:
+```
+node scripts/prebuild.mjs && npm run build
+```
 
----
+### npm install fallisce
+```bash
+npm install --legacy-peer-deps
+```
 
-## 📦 Funzionalità
-
-- ✅ Gestione ricette (CRUD completo)
-- ✅ Scale dosi proporzionale intelligente
-- ✅ Calcolo costi ingredienti
-- ✅ Timer integrato con vibrazione
-- ✅ Filtri e ricerca avanzata
-- ✅ Categorie personalizzabili
-- ✅ Tema chiaro/scuro/automatico
-- ✅ Modalità laboratorio (testo più grande)
-- ✅ Esporta backup JSON
-- ✅ Importa backup JSON
-- ✅ Esporta CSV costi
-- ✅ Condividi ricetta (formato WhatsApp)
-- ✅ Funzionamento completamente offline
-- ✅ Installabile come app (PWA)
-
----
-
-## 📄 Licenza
-
-Uso privato — Biscottificio Artigianale
+### sharp non funziona
+```bash
+npm install -D sharp
+node scripts/prebuild.mjs
+```

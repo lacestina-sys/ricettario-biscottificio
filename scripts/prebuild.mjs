@@ -1,11 +1,10 @@
 /**
- * Genera tutte le icone PNG necessarie per la PWA
- * Usa sharp per convertire SVG → PNG in tutte le dimensioni
- * Eseguito automaticamente come prebuild
+ * Script prebuild: genera icone PNG usando sharp
+ * node scripts/prebuild.mjs
  */
 
-import sharp from "sharp";
-import { readFileSync, mkdirSync, existsSync } from "fs";
+import { createRequire } from "module";
+import { mkdirSync, existsSync, writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -13,12 +12,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "..");
 const iconsDir = join(rootDir, "public", "icons");
 
-// Crea la cartella se non esiste
+// Crea cartella icons se non esiste
 if (!existsSync(iconsDir)) {
   mkdirSync(iconsDir, { recursive: true });
+  console.log("📁 Creata cartella public/icons/");
 }
 
-// SVG sorgente inline (non dipende dal file esterno per robustezza)
+// SVG sorgente
 const svgSource = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <rect width="512" height="512" rx="113" fill="#795548"/>
   <circle cx="256" cy="256" r="195" fill="#FFC107" opacity="0.18"/>
@@ -39,47 +39,54 @@ const svgSource = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
 
 const svgBuffer = Buffer.from(svgSource);
 
-// Tutte le dimensioni necessarie per PWABuilder + browser
+// Import dinamico di sharp
+let sharp;
+try {
+  const mod = await import("sharp");
+  sharp = mod.default;
+} catch (e) {
+  console.error("❌ sharp non trovato. Esegui: npm install -D sharp");
+  process.exit(1);
+}
+
 const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
 
-console.log("🍪 Generazione icone PNG per la PWA...\n");
+console.log("🍪 Generazione icone PNG...\n");
 
 for (const size of sizes) {
   const outputPath = join(iconsDir, `icon-${size}.png`);
   try {
     await sharp(svgBuffer)
       .resize(size, size)
-      .png({ quality: 100, compressionLevel: 9 })
+      .png({ compressionLevel: 9 })
       .toFile(outputPath);
-    console.log(`  ✅ icon-${size}.png (${size}x${size}px)`);
+    console.log(`  ✅ public/icons/icon-${size}.png`);
   } catch (err) {
     console.error(`  ❌ Errore icon-${size}.png:`, err.message);
     process.exit(1);
   }
 }
 
-// Genera anche apple-touch-icon (180x180)
-const appleTouchPath = join(rootDir, "public", "apple-touch-icon.png");
+// apple-touch-icon 180x180
 try {
   await sharp(svgBuffer)
     .resize(180, 180)
-    .png({ quality: 100 })
-    .toFile(appleTouchPath);
-  console.log(`  ✅ apple-touch-icon.png (180x180px)`);
+    .png()
+    .toFile(join(rootDir, "public", "apple-touch-icon.png"));
+  console.log(`  ✅ public/apple-touch-icon.png`);
 } catch (err) {
-  console.error(`  ❌ Errore apple-touch-icon.png:`, err.message);
+  console.error(`  ❌ apple-touch-icon:`, err.message);
 }
 
-// Genera favicon.png (32x32) come fallback
-const faviconPngPath = join(rootDir, "public", "favicon.png");
+// favicon.png 32x32
 try {
   await sharp(svgBuffer)
     .resize(32, 32)
-    .png({ quality: 100 })
-    .toFile(faviconPngPath);
-  console.log(`  ✅ favicon.png (32x32px)`);
+    .png()
+    .toFile(join(rootDir, "public", "favicon.png"));
+  console.log(`  ✅ public/favicon.png`);
 } catch (err) {
-  console.error(`  ❌ Errore favicon.png:`, err.message);
+  console.error(`  ❌ favicon.png:`, err.message);
 }
 
-console.log("\n🎉 Tutte le icone generate con successo!\n");
+console.log("\n✅ Icone generate! Ora esegui: npm run build\n");

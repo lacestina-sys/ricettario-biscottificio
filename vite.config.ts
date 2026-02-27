@@ -14,7 +14,20 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "apple-touch-icon.png", "icons/*.png"],
+      // Includi tutte le icone PNG negli assets
+      includeAssets: [
+        "favicon.svg",
+        "favicon.png",
+        "apple-touch-icon.png",
+        "icons/icon-72.png",
+        "icons/icon-96.png",
+        "icons/icon-128.png",
+        "icons/icon-144.png",
+        "icons/icon-152.png",
+        "icons/icon-192.png",
+        "icons/icon-384.png",
+        "icons/icon-512.png",
+      ],
       manifest: {
         name: "Il Mio Ricettario",
         short_name: "Ricettario",
@@ -78,39 +91,11 @@ export default defineConfig({
             purpose: "any maskable",
           },
         ],
-        screenshots: [
-          {
-            src: "screenshots/screen1.png",
-            sizes: "390x844",
-            type: "image/png",
-            form_factor: "narrow",
-            label: "Home - Il Mio Ricettario",
-          },
-        ],
-        shortcuts: [
-          {
-            name: "Nuova Ricetta",
-            short_name: "Crea",
-            description: "Aggiungi una nuova ricetta",
-            url: "/crea",
-            icons: [{ src: "icons/icon-96.png", sizes: "96x96" }],
-          },
-          {
-            name: "Lista Ricette",
-            short_name: "Ricette",
-            description: "Visualizza tutte le ricette",
-            url: "/ricette",
-            icons: [{ src: "icons/icon-96.png", sizes: "96x96" }],
-          },
-        ],
       },
       workbox: {
-        // Cache-first per assets statici
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,woff}"],
-        // Dimensione massima file da pre-cachare: 5MB
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
-          // Google Fonts CSS
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
@@ -118,12 +103,11 @@ export default defineConfig({
               cacheName: "google-fonts-cache",
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 anno
+                maxAgeSeconds: 60 * 60 * 24 * 365,
               },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
-          // Google Fonts file woff2
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: "CacheFirst",
@@ -136,27 +120,15 @@ export default defineConfig({
               cacheableResponse: { statuses: [0, 200] },
             },
           },
-          // Navigazione — restituisce sempre index.html (SPA)
-          {
-            urlPattern: /^https?:\/\/[^/]+\/(?!api).*/i,
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "pages-cache",
-              expiration: { maxEntries: 50 },
-              networkTimeoutSeconds: 3,
-            },
-          },
         ],
-        // Importante per SPA: qualsiasi route non trovata serve index.html
         navigateFallback: "index.html",
         navigateFallbackDenylist: [/^\/(api|_)/],
-        // Pulisce le cache obsolete automaticamente
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
       },
       devOptions: {
-        enabled: false, // non serve in dev
+        enabled: false,
       },
     }),
   ],
@@ -166,7 +138,6 @@ export default defineConfig({
     },
   },
   build: {
-    // Assicura che i chunk siano generati correttamente
     rollupOptions: {
       output: {
         manualChunks: {
